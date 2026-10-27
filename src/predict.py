@@ -102,16 +102,16 @@ class ChurnRetentionEngine:
         # Risk Classification
         if active_prob >= 0.65:
             risk_level = "High Churn Risk"
-            risk_color = "#E74C3C" # Red
-            badge_icon = "🚨"
+            risk_color = "#F43F5E"  # Muted Coral/Crimson
+            badge_icon = ""
         elif active_prob >= 0.35:
             risk_level = "Moderate Churn Risk"
-            risk_color = "#F39C12" # Amber
-            badge_icon = "⚠️"
+            risk_color = "#F59E0B"  # Muted Amber
+            badge_icon = ""
         else:
             risk_level = "Low Churn Risk"
-            risk_color = "#2ECC71" # Green
-            badge_icon = "✅"
+            risk_color = "#10B981"  # Muted Emerald
+            badge_icon = ""
 
         # Generate Action Plan
         action_plan = self.generate_retention_recommendations(customer_input, active_prob)

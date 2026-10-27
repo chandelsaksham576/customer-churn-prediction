@@ -278,7 +278,7 @@ def format_matte_plot(fig, title=None, height=310):
             showline=True,
             linecolor="#27272A",
             tickfont=dict(color="#A1A1AA", size=10),
-            titlefont=dict(color="#71717A", size=11)
+            title_font=dict(color="#71717A", size=11)
         ),
         yaxis=dict(
             showgrid=True,
@@ -287,7 +287,7 @@ def format_matte_plot(fig, title=None, height=310):
             zerolinecolor="#27272A",
             showline=False,
             tickfont=dict(color="#A1A1AA", size=10),
-            titlefont=dict(color="#71717A", size=11)
+            title_font=dict(color="#71717A", size=11)
         ),
         legend=dict(
             font=dict(color="#A1A1AA", size=10),

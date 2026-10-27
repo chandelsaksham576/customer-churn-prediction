@@ -22,9 +22,8 @@ desktop.ini
 *.swp
 *.swo
 
-# Large zip archives (optional to keep git repo fast)
+# Large zip archives and data caches
 *.zip
 churn_dataset.zip
+models/processed_data.pkl
 
-# Streamlit
-.streamlit/

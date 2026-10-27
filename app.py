@@ -105,29 +105,52 @@ RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 
 @st.cache_resource
 def load_engine():
-    """Initializes and caches the ChurnRetentionEngine."""
+    """Initializes and caches the ChurnRetentionEngine with automatic self-healing."""
     try:
+        from src.predict import ChurnRetentionEngine
+        engine = ChurnRetentionEngine(MODELS_DIR)
+        if engine.is_ready():
+            return engine
+    except Exception:
+        pass
+
+    # Self-healing: if models are missing or pickle versions differ on cloud runtime, retrain cleanly
+    try:
+        from src.preprocess import run_preprocessing
+        from src.train import train_and_evaluate
+        sample_csv = PROJECT_ROOT / "data" / "sample_data.csv"
+        run_preprocessing(data_path=sample_csv if sample_csv.exists() else None, sample_size=10000)
+        train_and_evaluate()
         from src.predict import ChurnRetentionEngine
         engine = ChurnRetentionEngine(MODELS_DIR)
         return engine
     except Exception as e:
+        st.sidebar.error(f"Engine initialization error: {e}")
         return None
 
 @st.cache_data
 def load_sample_data():
     """Loads a representative sample of raw cleaned data for EDA dashboard."""
     try:
+        # Priority 1: Lightweight sample CSV (ideal for cloud deployments)
+        sample_csv = PROJECT_ROOT / "data" / "sample_data.csv"
+        if sample_csv.exists():
+            return pd.read_csv(sample_csv)
+
+        # Priority 2: Serialized processed sample
         data_path = MODELS_DIR / "processed_data.pkl"
         if data_path.exists():
             import joblib
             data = joblib.load(data_path)
-            return data.get("raw_cleaned_sample")
-        # Fallback to reading first 15,000 rows of raw CSV
+            if "raw_cleaned_sample" in data:
+                return data["raw_cleaned_sample"]
+
+        # Priority 3: First rows of any raw CSV
         csv_files = list(RAW_DATA_DIR.glob("*.csv"))
         if csv_files:
             train_file = [f for f in csv_files if "train" in f.name.lower()]
             target_file = train_file[0] if train_file else csv_files[0]
-            df = pd.read_csv(target_file, nrows=15000)
+            df = pd.read_csv(target_file, nrows=5000)
             return df
     except Exception:
         pass

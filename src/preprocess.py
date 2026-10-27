@@ -255,6 +255,11 @@ def run_preprocessing(data_path: Path = None, sample_size: int = 100000, random_
     }
     joblib.dump(processed_data, MODELS_DIR / "processed_data.pkl")
 
+    # Automatically update lightweight sample_data.csv for Streamlit Cloud
+    sample_csv_path = PROJECT_ROOT / "data" / "sample_data.csv"
+    cleaned_df.head(5000).to_csv(sample_csv_path, index=False)
+    print(f"   💾 Updated lightweight cloud sample: {sample_csv_path.name} (5,000 rows)")
+
     print(f"✅ Preprocessing complete! Artifacts saved to: {MODELS_DIR}")
     return preprocessor, feature_metadata, processed_data
 

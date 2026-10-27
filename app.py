@@ -20,32 +20,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for executive design
+# Custom CSS for executive dark design
 st.markdown("""
 <style>
     .main-header {
         font-size: 2.2rem;
         font-weight: 700;
-        color: #1E293B;
+        color: #F8FAFC;
         margin-bottom: 0.2rem;
     }
     .sub-header {
         font-size: 1.05rem;
-        color: #64748B;
+        color: #94A3B8;
         margin-bottom: 1.5rem;
     }
     .metric-card {
-        background-color: #FFFFFF;
-        border: 1px solid #E2E8F0;
+        background-color: #1E293B;
+        border: 1px solid #334155;
         border-radius: 10px;
         padding: 1.2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
         text-align: center;
     }
     .metric-card h3 {
         margin: 0;
         font-size: 0.85rem;
-        color: #64748B;
+        color: #94A3B8;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -53,11 +53,12 @@ st.markdown("""
         margin: 0.4rem 0 0 0;
         font-size: 1.8rem;
         font-weight: 700;
-        color: #0F172A;
+        color: #38BDF8;
     }
     .action-card {
-        background: #F8FAFC;
-        border-left: 5px solid #2563EB;
+        background: #1E293B;
+        border: 1px solid #334155;
+        border-left: 5px solid #3B82F6;
         padding: 1rem 1.2rem;
         margin-bottom: 0.9rem;
         border-radius: 0 8px 8px 0;
@@ -65,32 +66,35 @@ st.markdown("""
     .action-title {
         font-weight: 700;
         font-size: 1.05rem;
-        color: #1E293B;
+        color: #F8FAFC;
     }
     .action-meta {
         font-size: 0.85rem;
-        color: #64748B;
+        color: #94A3B8;
         margin: 0.2rem 0 0.5rem 0;
     }
     .risk-high {
-        background-color: #FEE2E2;
-        color: #B91C1C;
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #F87171;
+        border: 1px solid rgba(239, 68, 68, 0.4);
         padding: 0.35rem 0.8rem;
         border-radius: 20px;
         font-weight: 600;
         display: inline-block;
     }
     .risk-mod {
-        background-color: #FEF3C7;
-        color: #B45309;
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #FBBF24;
+        border: 1px solid rgba(245, 158, 11, 0.4);
         padding: 0.35rem 0.8rem;
         border-radius: 20px;
         font-weight: 600;
         display: inline-block;
     }
     .risk-low {
-        background-color: #DCFCE7;
-        color: #15803D;
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34D399;
+        border: 1px solid rgba(16, 185, 129, 0.4);
         padding: 0.35rem 0.8rem;
         border-radius: 20px;
         font-weight: 600;
@@ -226,21 +230,21 @@ def main():
                 st.markdown(f"""
                 <div class="metric-card">
                     <h3>Total Portfolio Analyzed</h3>
-                    <p>{total_customers:,}</p>
+                    <p style="color: #38BDF8;">{total_customers:,}</p>
                 </div>
                 """, unsafe_allow_html=True)
             with kpi_col2:
                 st.markdown(f"""
                 <div class="metric-card">
                     <h3>Churned / At-Risk Cohort</h3>
-                    <p style="color: #DC2626;">{churned_count:,} <span style="font-size: 1rem; color: #DC2626;">({churn_rate:.1f}%)</span></p>
+                    <p style="color: #F87171;">{churned_count:,} <span style="font-size: 1rem; color: #F87171;">({churn_rate:.1f}%)</span></p>
                 </div>
                 """, unsafe_allow_html=True)
             with kpi_col3:
                 st.markdown(f"""
                 <div class="metric-card">
                     <h3>Overall Retention Rate</h3>
-                    <p style="color: #16A34A;">{retention_rate:.1f}%</p>
+                    <p style="color: #34D399;">{retention_rate:.1f}%</p>
                 </div>
                 """, unsafe_allow_html=True)
             with kpi_col4:
@@ -248,7 +252,7 @@ def main():
                 st.markdown(f"""
                 <div class="metric-card">
                     <h3>Revenue at Immediate Risk</h3>
-                    <p style="color: #EA580C;">{revenue_display}</p>
+                    <p style="color: #FB923C;">{revenue_display}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -272,7 +276,7 @@ def main():
                     title=f"Customer Status across {segment_col}",
                     text_auto=True
                 )
-                fig_status.update_layout(xaxis_title=segment_col, yaxis_title="Customer Count", template="plotly_white")
+                fig_status.update_layout(xaxis_title=segment_col, yaxis_title="Customer Count", template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig_status, use_container_width=True)
 
             with row1_col2:
@@ -292,7 +296,7 @@ def main():
                     text="Churn_Rate_%",
                     title=f"Churn Percentage across {tier_col}"
                 )
-                fig_tier.update_layout(yaxis_title="Churn Rate (%)", template="plotly_white")
+                fig_tier.update_layout(yaxis_title="Churn Rate (%)", template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig_tier, use_container_width=True)
 
             # Row 2 of Charts: Segmentation Scatter Plot & Support Escalations
@@ -317,7 +321,7 @@ def main():
                     title=f"{scatter_x} vs. {scatter_y} by Churn Status",
                     hover_data=[c for c in ["Age", "Support Calls", "Payment Delay"] if c in sample_scatter.columns]
                 )
-                fig_scatter.update_layout(template="plotly_white")
+                fig_scatter.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig_scatter, use_container_width=True)
 
             with row2_col2:
@@ -335,13 +339,13 @@ def main():
                         line_shape="spline"
                     )
                     fig_support.update_traces(line_color="#DC2626", line_width=3, marker=dict(size=8, color="#991B1B"))
-                    fig_support.update_layout(yaxis_title="Churn Rate (%)", template="plotly_white")
+                    fig_support.update_layout(yaxis_title="Churn Rate (%)", template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_support, use_container_width=True)
                 else:
                     # Alternative numerical feature distribution
                     num_alt = engine.metadata["numerical_features"][0]
                     fig_box = px.box(sample_df, x=target_col, y=num_alt, color=target_col, title=f"{num_alt} Distribution by Churn")
-                    fig_box.update_layout(template="plotly_white")
+                    fig_box.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_box, use_container_width=True)
 
     # =========================================================================
@@ -401,7 +405,7 @@ def main():
                         y=["Retained (0)", "Churned (1)"],
                         title="Logistic Regression Confusion Matrix"
                     )
-                    fig_cm_lr.update_layout(template="plotly_white")
+                    fig_cm_lr.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_cm_lr, use_container_width=True)
 
                 with cm_tabs[1]:
@@ -415,7 +419,7 @@ def main():
                         y=["Retained (0)", "Churned (1)"],
                         title="Decision Tree Confusion Matrix"
                     )
-                    fig_cm_dt.update_layout(template="plotly_white")
+                    fig_cm_dt.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_cm_dt, use_container_width=True)
 
             with viz_col2:
@@ -456,7 +460,9 @@ def main():
                     title="Receiver Operating Characteristic (ROC) Benchmark",
                     xaxis_title="False Positive Rate (1 - Specificity)",
                     yaxis_title="True Positive Rate (Sensitivity / Recall)",
-                    template="plotly_white",
+                    template="plotly_dark",
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
                     legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95)
                 )
                 st.plotly_chart(fig_roc, use_container_width=True)
@@ -480,7 +486,7 @@ def main():
                         color_discrete_map={"Increases Churn": "#EF4444", "Decreases Churn": "#10B981"},
                         title="Top Coefficients Influencing Churn Probability"
                     )
-                    fig_lr_fi.update_layout(yaxis=dict(autorange="reversed"), template="plotly_white")
+                    fig_lr_fi.update_layout(yaxis=dict(autorange="reversed"), template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_lr_fi, use_container_width=True)
 
             with fi_col2:
@@ -497,7 +503,7 @@ def main():
                         color_continuous_scale="Teal",
                         title="Decision Tree Gini Split Relevance"
                     )
-                    fig_dt_fi.update_layout(yaxis=dict(autorange="reversed"), template="plotly_white")
+                    fig_dt_fi.update_layout(yaxis=dict(autorange="reversed"), template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_dt_fi, use_container_width=True)
 
             # Decision Tree Rules Summary
@@ -618,27 +624,33 @@ def main():
                     mode="gauge+number",
                     value=prob_val,
                     domain={'x': [0, 1], 'y': [0, 1]},
-                    title={'text': f"Churn Probability ({res['selected_model']})", 'font': {'size': 18, 'color': '#1E293B'}},
+                    title={'text': f"Churn Probability ({res['selected_model']})", 'font': {'size': 18, 'color': '#F8FAFC'}},
                     number={'suffix': "%", 'font': {'size': 36, 'color': res['risk_color']}},
                     gauge={
-                        'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#475569"},
+                        'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#94A3B8"},
                         'bar': {'color': res['risk_color'], 'thickness': 0.3},
-                        'bgcolor': "white",
+                        'bgcolor': "#1E293B",
                         'borderwidth': 1,
-                        'bordercolor': "#CBD5E1",
+                        'bordercolor': "#334155",
                         'steps': [
-                            {'range': [0, 35], 'color': '#DCFCE7'},
-                            {'range': [35, 65], 'color': '#FEF3C7'},
-                            {'range': [65, 100], 'color': '#FEE2E2'}
+                            {'range': [0, 35], 'color': 'rgba(16, 185, 129, 0.25)'},
+                            {'range': [35, 65], 'color': 'rgba(245, 158, 11, 0.25)'},
+                            {'range': [65, 100], 'color': 'rgba(239, 68, 68, 0.25)'}
                         ],
                         'threshold': {
-                            'line': {'color': "#DC2626", 'width': 4},
+                            'line': {'color': "#EF4444", 'width': 4},
                             'thickness': 0.75,
                             'value': prob_val
                         }
                     }
                 ))
-                fig_gauge.update_layout(height=260, margin=dict(l=20, r=20, t=40, b=10), template="plotly_white")
+                fig_gauge.update_layout(
+                    height=260,
+                    margin=dict(l=20, r=20, t=40, b=10),
+                    template="plotly_dark",
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)"
+                )
                 st.plotly_chart(fig_gauge, use_container_width=True)
 
                 if selected_model_option == "Side-by-Side Comparison":
@@ -657,9 +669,9 @@ def main():
                     st.markdown(f"""
                     <div class="action-card">
                         <div class="action-title">💡 {item['title']}</div>
-                        <div class="action-meta"><strong>Driver:</strong> {item['trigger']} &nbsp;|&nbsp; <strong>Urgency:</strong> <span style="color: #DC2626; font-weight:600;">{item['urgency']}</span></div>
-                        <div style="font-size: 0.92rem; color: #334155;"><strong>Recommended Action:</strong> {item['action']}</div>
-                        <div style="font-size: 0.85rem; color: #16A34A; margin-top: 0.3rem;"><strong>Expected ROI Impact:</strong> {item['expected_impact']}</div>
+                        <div class="action-meta"><strong>Driver:</strong> {item['trigger']} &nbsp;|&nbsp; <strong>Urgency:</strong> <span style="color: #F87171; font-weight:600;">{item['urgency']}</span></div>
+                        <div style="font-size: 0.92rem; color: #CBD5E1;"><strong>Recommended Action:</strong> {item['action']}</div>
+                        <div style="font-size: 0.85rem; color: #34D399; margin-top: 0.3rem;"><strong>Expected ROI Impact:</strong> {item['expected_impact']}</div>
                     </div>
                     """, unsafe_allow_html=True)
 

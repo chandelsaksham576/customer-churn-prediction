@@ -340,18 +340,14 @@ def main():
 
     # Minimal App Header
     records_count = engine.metadata.get("train_records", 80000) if engine else 80000
-    st.markdown(f"""
-    <div class="app-header">
-        <div>
-            <h1 class="app-title">Customer Churn Analytics</h1>
-            <p class="app-subtitle">Predictive retention modeling and subscriber risk intelligence</p>
-        </div>
-        <div class="status-indicator">
-            <span class="status-dot"></span>
-            <span>Production Engine Ready &bull; {records_count:,} records</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    header_html = (
+        f"<div class='app-header'>"
+        f"<div><h1 class='app-title'>Customer Churn Analytics</h1>"
+        f"<p class='app-subtitle'>Predictive retention modeling and subscriber risk intelligence</p></div>"
+        f"<div class='status-indicator'><span class='status-dot'></span>"
+        f"<span>Production Engine Ready &bull; {records_count:,} records</span></div></div>"
+    )
+    st.markdown(header_html, unsafe_allow_html=True)
 
     if engine is None or df is None:
         st.error("Engine or dataset initialization in progress. Please refresh momentarily.")
@@ -369,30 +365,15 @@ def main():
     spend_col = "Total Spend" if "Total Spend" in df.columns else None
     revenue_at_risk = df[df[target_col] == 1][spend_col].sum() if spend_col else 0
 
-    st.markdown(f"""
-    <div class="kpi-row">
-        <div class="kpi-card">
-            <div class="kpi-label">Total Customers</div>
-            <div class="kpi-value">{total_customers:,}</div>
-            <div class="kpi-meta">Active portfolio sample</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Monthly Revenue at Risk</div>
-            <div class="kpi-value">${revenue_at_risk:,.0f}</div>
-            <div class="kpi-meta">Identified at-risk accounts</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Overall Retention Rate</div>
-            <div class="kpi-value">{retention_rate:.1f}%</div>
-            <div class="kpi-meta">{retained_customers:,} active subscribers</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Churn Rate</div>
-            <div class="kpi-value">{churn_rate:.1f}%</div>
-            <div class="kpi-meta">{churned_customers:,} accounts churned</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    kpi_html = (
+        f"<div class='kpi-row'>"
+        f"<div class='kpi-card'><div class='kpi-label'>Total Customers</div><div class='kpi-value'>{total_customers:,}</div><div class='kpi-meta'>Active portfolio sample</div></div>"
+        f"<div class='kpi-card'><div class='kpi-label'>Monthly Revenue at Risk</div><div class='kpi-value'>${revenue_at_risk:,.0f}</div><div class='kpi-meta'>Identified at-risk accounts</div></div>"
+        f"<div class='kpi-card'><div class='kpi-label'>Overall Retention Rate</div><div class='kpi-value'>{retention_rate:.1f}%</div><div class='kpi-meta'>{retained_customers:,} active subscribers</div></div>"
+        f"<div class='kpi-card'><div class='kpi-label'>Churn Rate</div><div class='kpi-value'>{churn_rate:.1f}%</div><div class='kpi-meta'>{churned_customers:,} accounts churned</div></div>"
+        f"</div>"
+    )
+    st.markdown(kpi_html, unsafe_allow_html=True)
 
     # 3 Streamlined Tabs
     tab_overview, tab_models, tab_lookup = st.tabs([
@@ -501,12 +482,6 @@ def main():
 
         # Scorecard comparison table
         with st.container(border=True):
-            st.markdown("""
-            <div style="font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.75rem;">
-                Classification Performance Benchmark
-            </div>
-            """, unsafe_allow_html=True)
-
             scorecard_rows = [
                 ("Accuracy", lr_m.get("accuracy", 0), dt_m.get("accuracy", 0)),
                 ("Precision", lr_m.get("precision", 0), dt_m.get("precision", 0)),
@@ -520,32 +495,15 @@ def main():
                 delta = val_dt - val_lr
                 winner = "Decision Tree" if delta > 0 else "Logistic Regression"
                 delta_str = f"+{delta*100:.2f}%" if delta > 0 else f"{delta*100:.2f}%"
-                rows_html += f"""
-                <tr>
-                    <td><strong>{name}</strong></td>
-                    <td>{val_lr*100:.2f}%</td>
-                    <td>{val_dt*100:.2f}%</td>
-                    <td style="color: {'#10B981' if delta >= 0 else '#F43F5E'};">{delta_str}</td>
-                    <td style="color: #A1A1AA;">{winner}</td>
-                </tr>
-                """
+                delta_color = "#10B981" if delta >= 0 else "#F43F5E"
+                rows_html += f"<tr><td><strong>{name}</strong></td><td>{val_lr*100:.2f}%</td><td>{val_dt*100:.2f}%</td><td style='color: {delta_color};'>{delta_str}</td><td style='color: #A1A1AA;'>{winner}</td></tr>"
 
-            st.markdown(f"""
-            <table class="comp-table">
-                <thead>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Logistic Regression</th>
-                        <th>Decision Tree</th>
-                        <th>Variance</th>
-                        <th>Best Performer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows_html}
-                </tbody>
-            </table>
-            """, unsafe_allow_html=True)
+            table_html = (
+                f"<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.75rem;'>Classification Performance Benchmark</div>"
+                f"<table class='comp-table'><thead><tr><th>Metric</th><th>Logistic Regression</th><th>Decision Tree</th><th>Variance</th><th>Best Performer</th></tr></thead>"
+                f"<tbody>{rows_html}</tbody></table>"
+            )
+            st.markdown(table_html, unsafe_allow_html=True)
 
         st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
@@ -735,38 +693,38 @@ def main():
                     st.markdown(f'<span class="{pill_class}">{pill_text}</span>', unsafe_allow_html=True)
 
                     # Minimal horizontal progress bar
-                    st.markdown(f"""
-                    <div style="margin-top: 1.25rem;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #A1A1AA; margin-bottom: 0.35rem;">
-                            <span>Churn Likelihood</span>
-                            <span style="font-weight: 600; color: #FAFAFA;">{prob_pct}%</span>
-                        </div>
-                        <div style="background-color: #27272A; height: 6px; border-radius: 9999px; overflow: hidden;">
-                            <div style="background-color: {bar_color}; width: {prob_pct}%; height: 100%; border-radius: 9999px;"></div>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    progress_html = (
+                        f"<div style='margin-top: 1.25rem;'>"
+                        f"<div style='display: flex; justify-content: space-between; font-size: 0.75rem; color: #A1A1AA; margin-bottom: 0.35rem;'>"
+                        f"<span>Churn Likelihood</span><span style='font-weight: 600; color: #FAFAFA;'>{prob_pct}%</span>"
+                        f"</div>"
+                        f"<div style='background-color: #27272A; height: 6px; border-radius: 9999px; overflow: hidden;'>"
+                        f"<div style='background-color: {bar_color}; width: {prob_pct}%; height: 100%; border-radius: 9999px;'></div>"
+                        f"</div></div>"
+                    )
+                    st.markdown(progress_html, unsafe_allow_html=True)
 
                     if active_model_type == "Dual-Model":
-                        st.markdown(f"""
-                        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #27272A; font-size: 0.75rem; color: #71717A;">
-                            <div>Decision Tree: <span style="color: #FAFAFA; font-weight: 500;">{pred_res['decision_tree']['probability_pct']}%</span></div>
-                            <div style="margin-top: 0.2rem;">Logistic Regression: <span style="color: #FAFAFA; font-weight: 500;">{pred_res['logistic_regression']['probability_pct']}%</span></div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        dual_html = (
+                            f"<div style='margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #27272A; font-size: 0.75rem; color: #71717A;'>"
+                            f"<div>Decision Tree: <span style='color: #FAFAFA; font-weight: 500;'>{pred_res['decision_tree']['probability_pct']}%</span></div>"
+                            f"<div style='margin-top: 0.2rem;'>Logistic Regression: <span style='color: #FAFAFA; font-weight: 500;'>{pred_res['logistic_regression']['probability_pct']}%</span></div>"
+                            f"</div>"
+                        )
+                        st.markdown(dual_html, unsafe_allow_html=True)
 
                 with out_col2:
                     st.markdown("<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.5rem;'>Prescribed Retention Actions</div>", unsafe_allow_html=True)
                     actions = pred_res["action_plan"]
                     action_html = ""
                     for a in actions:
-                        action_html += f"""
-                        <div class="action-row">
-                            <div class="action-name">{a['title']}</div>
-                            <div class="action-detail">{a['action']}</div>
-                            <div class="action-impact">Impact: {a['expected_impact']} &bull; Priority: {a['urgency']}</div>
-                        </div>
-                        """
+                        action_html += (
+                            f"<div class='action-row'>"
+                            f"<div class='action-name'>{a['title']}</div>"
+                            f"<div class='action-detail'>{a['action']}</div>"
+                            f"<div class='action-impact'>Impact: {a['expected_impact']} &bull; Priority: {a['urgency']}</div>"
+                            f"</div>"
+                        )
                     st.markdown(action_html, unsafe_allow_html=True)
 
 if __name__ == "__main__":

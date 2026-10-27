@@ -1,0 +1,108 @@
+{
+    "target_column": "Churn",
+    "id_columns": [
+        "CustomerID"
+    ],
+    "numerical_features": [
+        "Age",
+        "Tenure",
+        "Usage Frequency",
+        "Support Calls",
+        "Payment Delay",
+        "Total Spend",
+        "Last Interaction"
+    ],
+    "categorical_features": [
+        "Gender",
+        "Subscription Type",
+        "Contract Length"
+    ],
+    "encoded_feature_names": [
+        "Age",
+        "Tenure",
+        "Usage Frequency",
+        "Support Calls",
+        "Payment Delay",
+        "Total Spend",
+        "Last Interaction",
+        "Gender_Female",
+        "Gender_Male",
+        "Subscription Type_Basic",
+        "Subscription Type_Premium",
+        "Subscription Type_Standard",
+        "Contract Length_Annual",
+        "Contract Length_Monthly",
+        "Contract Length_Quarterly"
+    ],
+    "total_records": 100000,
+    "train_records": 80000,
+    "test_records": 20000,
+    "churn_rate": 0.56711,
+    "feature_stats": {
+        "Age": {
+            "min": 18.0,
+            "max": 65.0,
+            "median": 39.0,
+            "mean": 39.40745,
+            "default": 39.0
+        },
+        "Tenure": {
+            "min": 1.0,
+            "max": 60.0,
+            "median": 32.0,
+            "mean": 31.34337,
+            "default": 32.0
+        },
+        "Usage Frequency": {
+            "min": 1.0,
+            "max": 30.0,
+            "median": 16.0,
+            "mean": 15.81763,
+            "default": 16.0
+        },
+        "Support Calls": {
+            "min": 0.0,
+            "max": 10.0,
+            "median": 3.0,
+            "mean": 3.60388,
+            "default": 3.0
+        },
+        "Payment Delay": {
+            "min": 0.0,
+            "max": 30.0,
+            "median": 12.0,
+            "mean": 12.96562,
+            "default": 12.0
+        },
+        "Total Spend": {
+            "min": 100.0,
+            "max": 1000.0,
+            "median": 661.425,
+            "mean": 631.5619676,
+            "default": 661.425
+        },
+        "Last Interaction": {
+            "min": 1.0,
+            "max": 30.0,
+            "median": 14.0,
+            "mean": 14.45142,
+            "default": 14.0
+        }
+    },
+    "categorical_unique": {
+        "Gender": [
+            "Female",
+            "Male"
+        ],
+        "Subscription Type": [
+            "Basic",
+            "Premium",
+            "Standard"
+        ],
+        "Contract Length": [
+            "Annual",
+            "Monthly",
+            "Quarterly"
+        ]
+    }
+}

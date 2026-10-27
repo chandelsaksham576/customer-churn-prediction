@@ -29,13 +29,33 @@ st.markdown("""
     footer {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    .block-container {
-        padding-top: 1.25rem !important;
-        padding-bottom: 2.5rem !important;
-        padding-left: 3rem !important;
-        padding-right: 3rem !important;
+    /* Force 100% Full Viewport Width across all Streamlit versions & selectors */
+    html, body {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    section.main {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .block-container,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stAppViewBlockContainer"],
+    .stMainBlockContainer,
+    section.main .block-container,
+    div[data-testid="stMain"] .block-container,
+    .appview-container section.main,
+    .appview-container .main .block-container {
         max-width: 100% !important;
         width: 100% !important;
+        padding-top: 1.25rem !important;
+        padding-bottom: 2.5rem !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
     }
 
     /* Prevent metric labels and numbers from truncating with ellipsis */

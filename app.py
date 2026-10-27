@@ -1,7 +1,7 @@
 """
 app.py
 Minimal Matte-Dark Customer Churn Analytics Dashboard
-Design Language: Inspired by Vercel, Linear, and Raycast (Zinc / Matte Carbon)
+Built with 100% Native Streamlit Containers & Components for Robust Cloud Rendering
 """
 
 import json
@@ -20,10 +20,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Minimal Matte-Dark CSS (Zinc/Carbon Theme, Zero Drop-Shadows, Clean Typography)
+# Minimal Matte-Dark CSS (Zinc/Carbon Theme, Zero Shadows, Native Overrides)
 st.markdown("""
 <style>
-    /* Hide Streamlit default chrome & tighten top spacing */
+    /* Hide Streamlit default chrome & reduce top padding */
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
     footer {visibility: hidden;}
@@ -43,78 +43,27 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
     }
 
-    /* App Header Bar */
-    .app-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 1rem;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #27272A;
-    }
-    .app-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #FAFAFA;
-        letter-spacing: -0.02em;
-        margin: 0;
-    }
-    .app-subtitle {
-        font-size: 0.8125rem;
-        color: #71717A;
-        margin: 0.15rem 0 0 0;
-    }
-    .status-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: #A1A1AA;
-        background-color: #121215;
-        border: 1px solid #27272A;
-        border-radius: 9999px;
-        padding: 0.25rem 0.65rem;
-    }
-    .status-dot {
-        width: 6px;
-        height: 6px;
-        background-color: #10B981;
-        border-radius: 50%;
+    /* Native Card Containers */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border-color: #27272A !important;
+        border-radius: 6px !important;
+        background-color: #121215 !important;
+        box-shadow: none !important;
     }
 
-    /* KPI Cards */
-    .kpi-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+    /* Native Metric Styling (Vercel / Linear inspired) */
+    [data-testid="stMetricValue"] {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        color: #FAFAFA !important;
+        letter-spacing: -0.02em !important;
     }
-    .kpi-card {
-        background-color: #121215;
-        border: 1px solid #27272A;
-        border-radius: 6px;
-        padding: 1rem 1.2rem;
-    }
-    .kpi-label {
-        font-size: 11px;
-        font-weight: 500;
-        color: #A1A1AA;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.4rem;
-    }
-    .kpi-value {
-        font-size: 24px;
-        font-weight: 600;
-        color: #FAFAFA;
-        letter-spacing: -0.02em;
-        line-height: 1.15;
-    }
-    .kpi-meta {
-        font-size: 11px;
-        color: #71717A;
-        margin-top: 0.35rem;
+    [data-testid="stMetricLabel"] {
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        color: #A1A1AA !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
     }
 
     /* Tabs Styling */
@@ -140,15 +89,7 @@ st.markdown("""
         border-bottom: 2px solid #FAFAFA !important;
     }
 
-    /* Surface Container Styling */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border-color: #27272A !important;
-        border-radius: 6px !important;
-        background-color: #121215 !important;
-        box-shadow: none !important;
-    }
-
-    /* Primary Matte Button (Linear / Vercel style) */
+    /* Primary Matte Button */
     .stButton > button {
         background-color: #FAFAFA !important;
         color: #09090B !important;
@@ -164,88 +105,6 @@ st.markdown("""
         opacity: 0.9 !important;
         color: #09090B !important;
         border-color: #FAFAFA !important;
-    }
-
-    /* Status Pills */
-    .pill-high {
-        background-color: #3F131C;
-        color: #FB7185;
-        border: 1px solid #9F1239;
-        border-radius: 9999px;
-        padding: 0.2rem 0.65rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        display: inline-block;
-    }
-    .pill-mod {
-        background-color: #382006;
-        color: #FBBF24;
-        border: 1px solid #78350F;
-        border-radius: 9999px;
-        padding: 0.2rem 0.65rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        display: inline-block;
-    }
-    .pill-low {
-        background-color: #062E22;
-        color: #34D399;
-        border: 1px solid #065F46;
-        border-radius: 9999px;
-        padding: 0.2rem 0.65rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        display: inline-block;
-    }
-
-    /* Recommendation Action Row */
-    .action-row {
-        border-bottom: 1px solid #27272A;
-        padding: 0.85rem 0;
-    }
-    .action-row:last-child {
-        border-bottom: none;
-    }
-    .action-name {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #FAFAFA;
-        margin-bottom: 0.2rem;
-    }
-    .action-detail {
-        font-size: 0.8125rem;
-        color: #A1A1AA;
-        line-height: 1.4;
-    }
-    .action-impact {
-        font-size: 0.75rem;
-        color: #10B981;
-        margin-top: 0.25rem;
-    }
-
-    /* Comparison Table Styling */
-    .comp-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-    }
-    .comp-table th {
-        text-align: left;
-        color: #71717A;
-        font-weight: 500;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0.6rem 0.75rem;
-        border-bottom: 1px solid #27272A;
-    }
-    .comp-table td {
-        padding: 0.7rem 0.75rem;
-        border-bottom: 1px solid #18181B;
-        color: #FAFAFA;
-    }
-    .comp-table tr:hover {
-        background-color: #18181B;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -338,24 +197,26 @@ def main():
     engine = load_engine()
     df = load_data_sample()
 
-    # Minimal App Header
-    records_count = engine.metadata.get("train_records", 80000) if engine else 80000
-    header_html = (
-        f"<div class='app-header'>"
-        f"<div><h1 class='app-title'>Customer Churn Analytics</h1>"
-        f"<p class='app-subtitle'>Predictive retention modeling and subscriber risk intelligence</p></div>"
-        f"<div class='status-indicator'><span class='status-dot'></span>"
-        f"<span>Production Engine Ready &bull; {records_count:,} records</span></div></div>"
-    )
-    st.markdown(header_html, unsafe_allow_html=True)
-
     if engine is None or df is None:
         st.error("Engine or dataset initialization in progress. Please refresh momentarily.")
         return
 
+    records_count = engine.metadata.get("train_records", 80000) if engine else 80000
     target_col = engine.metadata.get("target_column", "Churn")
 
-    # Top KPI Row (4 flat cards)
+    # Native Header Row
+    head_left, head_right = st.columns([3, 1])
+    with head_left:
+        st.markdown("<h1 style='margin:0; font-size: 1.5rem; font-weight: 600; color: #FAFAFA; letter-spacing: -0.02em;'>Customer Churn Analytics</h1>", unsafe_allow_html=True)
+        st.caption("Predictive retention modeling and subscriber risk intelligence")
+    with head_right:
+        st.markdown("<div style='height: 0.35rem;'></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.caption(f"Engine Ready • {records_count:,} records")
+
+    st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+
+    # Top KPI Row (4 Native Bordered Cards)
     total_customers = len(df)
     churned_customers = int((df[target_col] == 1).sum())
     retained_customers = total_customers - churned_customers
@@ -365,15 +226,21 @@ def main():
     spend_col = "Total Spend" if "Total Spend" in df.columns else None
     revenue_at_risk = df[df[target_col] == 1][spend_col].sum() if spend_col else 0
 
-    kpi_html = (
-        f"<div class='kpi-row'>"
-        f"<div class='kpi-card'><div class='kpi-label'>Total Customers</div><div class='kpi-value'>{total_customers:,}</div><div class='kpi-meta'>Active portfolio sample</div></div>"
-        f"<div class='kpi-card'><div class='kpi-label'>Monthly Revenue at Risk</div><div class='kpi-value'>${revenue_at_risk:,.0f}</div><div class='kpi-meta'>Identified at-risk accounts</div></div>"
-        f"<div class='kpi-card'><div class='kpi-label'>Overall Retention Rate</div><div class='kpi-value'>{retention_rate:.1f}%</div><div class='kpi-meta'>{retained_customers:,} active subscribers</div></div>"
-        f"<div class='kpi-card'><div class='kpi-label'>Churn Rate</div><div class='kpi-value'>{churn_rate:.1f}%</div><div class='kpi-meta'>{churned_customers:,} accounts churned</div></div>"
-        f"</div>"
-    )
-    st.markdown(kpi_html, unsafe_allow_html=True)
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+    with kpi1:
+        with st.container(border=True):
+            st.metric("Total Customers", f"{total_customers:,}", help="Active portfolio sample")
+    with kpi2:
+        with st.container(border=True):
+            st.metric("Monthly Revenue at Risk", f"${revenue_at_risk:,.0f}", help="Identified at-risk accounts")
+    with kpi3:
+        with st.container(border=True):
+            st.metric("Overall Retention Rate", f"{retention_rate:.1f}%", help=f"{retained_customers:,} active subscribers")
+    with kpi4:
+        with st.container(border=True):
+            st.metric("Churn Rate", f"{churn_rate:.1f}%", help=f"{churned_customers:,} accounts churned")
+
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # 3 Streamlined Tabs
     tab_overview, tab_models, tab_lookup = st.tabs([
@@ -422,7 +289,7 @@ def main():
                 )
                 format_matte_plot(fig_tier, title=f"Churn Rate across {tier_col}")
                 fig_tier.update_traces(textposition="outside", textfont=dict(color="#A1A1AA", size=10))
-                fig_tier.update_layout(xaxis_title="", yaxis_title="Churn Rate (%)", yaxis=dict(range=[0, max(tier_churn["Churn_Rate_%"]) * 1.2]))
+                fig_tier.update_layout(xaxis_title="", yaxis_title="Churn Rate (%)", yaxis=dict(range=[0, max(tier_churn["Churn_Rate_%"]) * 1.25]))
                 st.plotly_chart(fig_tier, use_container_width=True, config={"displayModeBar": False})
 
         row2_col1, row2_col2 = st.columns(2)
@@ -480,30 +347,48 @@ def main():
         lr_m = metrics.get("Logistic Regression", {})
         dt_m = metrics.get("Decision Tree", {})
 
-        # Scorecard comparison table
+        # Native Streamlit Benchmark Table
         with st.container(border=True):
-            scorecard_rows = [
-                ("Accuracy", lr_m.get("accuracy", 0), dt_m.get("accuracy", 0)),
-                ("Precision", lr_m.get("precision", 0), dt_m.get("precision", 0)),
-                ("Recall", lr_m.get("recall", 0), dt_m.get("recall", 0)),
-                ("F1-Score", lr_m.get("f1", 0), dt_m.get("f1", 0)),
-                ("ROC-AUC", lr_m.get("roc_auc", 0), dt_m.get("roc_auc", 0))
-            ]
-
-            rows_html = ""
-            for name, val_lr, val_dt in scorecard_rows:
-                delta = val_dt - val_lr
-                winner = "Decision Tree" if delta > 0 else "Logistic Regression"
-                delta_str = f"+{delta*100:.2f}%" if delta > 0 else f"{delta*100:.2f}%"
-                delta_color = "#10B981" if delta >= 0 else "#F43F5E"
-                rows_html += f"<tr><td><strong>{name}</strong></td><td>{val_lr*100:.2f}%</td><td>{val_dt*100:.2f}%</td><td style='color: {delta_color};'>{delta_str}</td><td style='color: #A1A1AA;'>{winner}</td></tr>"
-
-            table_html = (
-                f"<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.75rem;'>Classification Performance Benchmark</div>"
-                f"<table class='comp-table'><thead><tr><th>Metric</th><th>Logistic Regression</th><th>Decision Tree</th><th>Variance</th><th>Best Performer</th></tr></thead>"
-                f"<tbody>{rows_html}</tbody></table>"
-            )
-            st.markdown(table_html, unsafe_allow_html=True)
+            st.markdown("<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.5rem;'>Classification Performance Benchmark</div>", unsafe_allow_html=True)
+            
+            scorecard_df = pd.DataFrame([
+                {
+                    "Metric": "Accuracy",
+                    "Logistic Regression": f"{lr_m.get('accuracy', 0)*100:.2f}%",
+                    "Decision Tree": f"{dt_m.get('accuracy', 0)*100:.2f}%",
+                    "Variance": f"+{(dt_m.get('accuracy', 0) - lr_m.get('accuracy', 0))*100:.2f}%",
+                    "Best Performer": "Decision Tree"
+                },
+                {
+                    "Metric": "Precision",
+                    "Logistic Regression": f"{lr_m.get('precision', 0)*100:.2f}%",
+                    "Decision Tree": f"{dt_m.get('precision', 0)*100:.2f}%",
+                    "Variance": f"+{(dt_m.get('precision', 0) - lr_m.get('precision', 0))*100:.2f}%",
+                    "Best Performer": "Decision Tree"
+                },
+                {
+                    "Metric": "Recall",
+                    "Logistic Regression": f"{lr_m.get('recall', 0)*100:.2f}%",
+                    "Decision Tree": f"{dt_m.get('recall', 0)*100:.2f}%",
+                    "Variance": f"+{(dt_m.get('recall', 0) - lr_m.get('recall', 0))*100:.2f}%",
+                    "Best Performer": "Decision Tree"
+                },
+                {
+                    "Metric": "F1-Score",
+                    "Logistic Regression": f"{lr_m.get('f1', 0)*100:.2f}%",
+                    "Decision Tree": f"{dt_m.get('f1', 0)*100:.2f}%",
+                    "Variance": f"+{(dt_m.get('f1', 0) - lr_m.get('f1', 0))*100:.2f}%",
+                    "Best Performer": "Decision Tree"
+                },
+                {
+                    "Metric": "ROC-AUC",
+                    "Logistic Regression": f"{lr_m.get('roc_auc', 0):.4f}",
+                    "Decision Tree": f"{dt_m.get('roc_auc', 0):.4f}",
+                    "Variance": f"+{dt_m.get('roc_auc', 0) - lr_m.get('roc_auc', 0):.4f}",
+                    "Best Performer": "Decision Tree"
+                }
+            ])
+            st.dataframe(scorecard_df, use_container_width=True, hide_index=True)
 
         st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
@@ -669,63 +554,35 @@ def main():
             pred_res = engine.predict_single(input_data, model_name=model_eval_name)
             prob_pct = pred_res["probability_pct"]
 
-            # Set flat pill style
-            if prob_pct >= 65:
-                pill_class = "pill-high"
-                pill_text = "High Churn Risk"
-                bar_color = "#F43F5E"
-            elif prob_pct >= 35:
-                pill_class = "pill-mod"
-                pill_text = "Moderate Churn Risk"
-                bar_color = "#F59E0B"
-            else:
-                pill_class = "pill-low"
-                pill_text = "Low Churn Risk"
-                bar_color = "#10B981"
-
             st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
             with st.container(border=True):
                 out_col1, out_col2 = st.columns([1, 1.4])
 
                 with out_col1:
-                    st.markdown("<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.75rem;'>Assessment Result</div>", unsafe_allow_html=True)
-                    st.markdown(f'<span class="{pill_class}">{pill_text}</span>', unsafe_allow_html=True)
+                    st.markdown("<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.5rem;'>Assessment Result</div>", unsafe_allow_html=True)
+                    if prob_pct >= 65:
+                        st.error(f"High Churn Risk — {prob_pct}% Likelihood")
+                    elif prob_pct >= 35:
+                        st.warning(f"Moderate Churn Risk — {prob_pct}% Likelihood")
+                    else:
+                        st.success(f"Low Churn Risk — {prob_pct}% Likelihood")
 
-                    # Minimal horizontal progress bar
-                    progress_html = (
-                        f"<div style='margin-top: 1.25rem;'>"
-                        f"<div style='display: flex; justify-content: space-between; font-size: 0.75rem; color: #A1A1AA; margin-bottom: 0.35rem;'>"
-                        f"<span>Churn Likelihood</span><span style='font-weight: 600; color: #FAFAFA;'>{prob_pct}%</span>"
-                        f"</div>"
-                        f"<div style='background-color: #27272A; height: 6px; border-radius: 9999px; overflow: hidden;'>"
-                        f"<div style='background-color: {bar_color}; width: {prob_pct}%; height: 100%; border-radius: 9999px;'></div>"
-                        f"</div></div>"
-                    )
-                    st.markdown(progress_html, unsafe_allow_html=True)
+                    st.progress(prob_pct / 100.0)
 
                     if active_model_type == "Dual-Model":
-                        dual_html = (
-                            f"<div style='margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #27272A; font-size: 0.75rem; color: #71717A;'>"
-                            f"<div>Decision Tree: <span style='color: #FAFAFA; font-weight: 500;'>{pred_res['decision_tree']['probability_pct']}%</span></div>"
-                            f"<div style='margin-top: 0.2rem;'>Logistic Regression: <span style='color: #FAFAFA; font-weight: 500;'>{pred_res['logistic_regression']['probability_pct']}%</span></div>"
-                            f"</div>"
-                        )
-                        st.markdown(dual_html, unsafe_allow_html=True)
+                        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+                        with st.container(border=True):
+                            st.caption(f"Decision Tree: {pred_res['decision_tree']['probability_pct']}% • Logistic Regression: {pred_res['logistic_regression']['probability_pct']}%")
 
                 with out_col2:
                     st.markdown("<div style='font-size: 0.8125rem; font-weight: 600; color: #FAFAFA; margin-bottom: 0.5rem;'>Prescribed Retention Actions</div>", unsafe_allow_html=True)
                     actions = pred_res["action_plan"]
-                    action_html = ""
                     for a in actions:
-                        action_html += (
-                            f"<div class='action-row'>"
-                            f"<div class='action-name'>{a['title']}</div>"
-                            f"<div class='action-detail'>{a['action']}</div>"
-                            f"<div class='action-impact'>Impact: {a['expected_impact']} &bull; Priority: {a['urgency']}</div>"
-                            f"</div>"
-                        )
-                    st.markdown(action_html, unsafe_allow_html=True)
+                        with st.container(border=True):
+                            st.markdown(f"**{a['title']}**")
+                            st.caption(f"{a['action']}")
+                            st.markdown(f"<div style='font-size: 0.75rem; color: #10B981;'>Impact: {a['expected_impact']} &bull; Priority: {a['urgency']}</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

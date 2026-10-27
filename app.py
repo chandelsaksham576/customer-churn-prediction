@@ -32,8 +32,26 @@ st.markdown("""
     .block-container {
         padding-top: 1.25rem !important;
         padding-bottom: 2.5rem !important;
-        max-width: 1280px !important;
-        margin: 0 auto !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Prevent metric labels and numbers from truncating with ellipsis */
+    [data-testid="stMetricLabel"] {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+    [data-testid="stMetricLabel"] > div {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+    [data-testid="stMetricValue"] {
+        white-space: nowrap !important;
+        overflow: visible !important;
     }
 
     /* Base Typography & Backgrounds */

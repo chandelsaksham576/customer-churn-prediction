@@ -2,40 +2,7 @@ import os
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
-
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
-    tc = cell._tc
-    tcPr = tc.get_or_add_tcPr()
-    tcMar = OxmlElement('w:tcMar')
-    for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
-        node = OxmlElement(f'w:{m}')
-        node.set(qn('w:w'), str(val))
-        node.set(qn('w:type'), 'dxa')
-        tcMar.append(node)
-    tcPr.append(tcMar)
-
-def set_cell_shading(cell, color_hex):
-    tcPr = cell._tc.get_or_add_tcPr()
-    shd = OxmlElement('w:shd')
-    shd.set(qn('w:val'), 'clear')
-    shd.set(qn('w:color'), 'auto')
-    shd.set(qn('w:fill'), color_hex)
-    tcPr.append(shd)
-
-def set_table_borders(table, color="D1D5DB", sz="4", val="single"):
-    tblPr = table._tbl.tblPr
-    tblBorders = OxmlElement('w:tblBorders')
-    for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
-        border = OxmlElement(f'w:{border_name}')
-        border.set(qn('w:val'), val)
-        border.set(qn('w:sz'), sz)
-        border.set(qn('w:space'), '0')
-        border.set(qn('w:color'), color)
-        tblBorders.append(border)
-    tblPr.append(tblBorders)
+from docx.enum.table import WD_TABLE_ALIGNMENT
 
 def add_p(doc, text="", align=WD_ALIGN_PARAGRAPH.LEFT, space_before=0, space_after=6, line_spacing=1.15):
     p = doc.add_paragraph()
@@ -123,11 +90,12 @@ def add_image_safe(doc, img_path, width_in=5.5, caption=""):
             rc.font.size = Pt(10.5)
             rc.font.color.rgb = RGBColor(75, 85, 99)
 
-def format_cell_text(cell, text, bold=False, align=WD_ALIGN_PARAGRAPH.LEFT, size=10.5):
+def format_cell(cell, text, bold=False, align=WD_ALIGN_PARAGRAPH.LEFT, size=10.5):
     p = cell.paragraphs[0]
     p.alignment = align
-    p.paragraph_format.space_before = Pt(2)
-    p.paragraph_format.space_after = Pt(2)
+    p.paragraph_format.space_before = Pt(4)
+    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.line_spacing = 1.0
     run = p.add_run(text)
     run.font.name = 'Times New Roman'
     run.font.size = Pt(size)
@@ -137,10 +105,10 @@ def format_cell_text(cell, text, bold=False, align=WD_ALIGN_PARAGRAPH.LEFT, size
 def create_report():
     doc = docx.Document()
     
-    # Page Setup (1 inch all around, portrait)
+    # Page Margins (1 inch top, bottom, left, right)
     for section in doc.sections:
         section.top_margin = Inches(1.0)
-        section.bottom_margin = Inches(0.9)
+        section.bottom_margin = Inches(1.0)
         section.left_margin = Inches(1.0)
         section.right_margin = Inches(1.0)
 
@@ -148,15 +116,15 @@ def create_report():
     fig_dir = r"C:\Users\chand\.gemini\antigravity\scratch\customer-churn-prediction\reports\figures"
 
     # ==================== COVER PAGE ====================
-    p = add_p(doc, "Designing and Implementing a Mini Project on", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=24, space_after=6)
+    p = add_p(doc, "Designing and Implementing a Mini Project on", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=20, space_after=6)
     p.runs[0].font.size = Pt(14)
     
-    p = add_p(doc, "Customer Churn Prediction and Retention System", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=12, space_after=12)
+    p = add_p(doc, "Customer Churn Prediction and Retention System", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=10, space_after=10)
     p.runs[0].font.size = Pt(22)
     p.runs[0].bold = True
     p.runs[0].font.color.rgb = RGBColor(15, 23, 42)
 
-    p = add_p(doc, "Machine Learning based Customer Retention & Churn Analytics using a Large-Scale Subscription Dataset and a Deployed Streamlit Cloud Web Application", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=24)
+    p = add_p(doc, "Machine Learning based Customer Retention & Churn Analytics using a Large-Scale Subscription Dataset and a Deployed Streamlit Cloud Web Application", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=20)
     p.runs[0].font.size = Pt(11)
     p.runs[0].italic = True
 
@@ -167,7 +135,7 @@ def create_report():
     p = add_p(doc, "Bachelor of Engineering", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=2)
     p.runs[0].bold = True
     add_p(doc, "in", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=2)
-    p = add_p(doc, "Information Technology", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=20)
+    p = add_p(doc, "Information Technology", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=18)
     p.runs[0].bold = True
 
     add_p(doc, "by", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=4)
@@ -175,8 +143,8 @@ def create_report():
         p = add_p(doc, name_roll, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=2)
         p.runs[0].bold = True
 
-    add_p(doc, "Under the guidance of", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=16, space_after=2)
-    p = add_p(doc, "Prof. Shweta Wankhede", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    add_p(doc, "Under the guidance of", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=14, space_after=2)
+    p = add_p(doc, "Prof. Shweta Wankhede", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=12)
     p.runs[0].bold = True
 
     if os.path.exists(logo_path):
@@ -196,29 +164,23 @@ def create_report():
     add_heading_1(doc, "CERTIFICATE")
     p = add_p(doc, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_before=16, space_after=24, line_spacing=1.3)
     p.add_run("This is to certify that ")
-    r = p.add_run("Prince Maurya (Roll No. 8348)")
-    r.bold = True
+    p.add_run("Prince Maurya (Roll No. 8348)").bold = True
     p.add_run(", ")
-    r = p.add_run("Ritika Gautam (Roll No. 8352)")
-    r.bold = True
+    p.add_run("Ritika Gautam (Roll No. 8352)").bold = True
     p.add_run(", and ")
-    r = p.add_run("Saksham Chandel (Roll No. 8356)")
-    r.bold = True
+    p.add_run("Saksham Chandel (Roll No. 8356)").bold = True
     p.add_run(" of class T.E. IT have successfully completed their mini project work on ")
-    r = p.add_run("Customer Churn Prediction and Retention System using Machine Learning")
-    r.bold = True
+    p.add_run("Customer Churn Prediction and Retention System using Machine Learning").bold = True
     p.add_run(" at ")
-    r = p.add_run("Army Institute of Technology")
-    r.bold = True
+    p.add_run("Army Institute of Technology").bold = True
     p.add_run(", in partial fulfillment of the Bachelor of Engineering degree course in Information Technology for the academic year 2026-2027, Semester I, as prescribed by ")
-    r = p.add_run("Savitribai Phule Pune University")
-    r.bold = True
+    p.add_run("Savitribai Phule Pune University").bold = True
     p.add_run(".")
 
+    # Borderless signature table
     table_cert = doc.add_table(rows=1, cols=2)
     table_cert.alignment = WD_TABLE_ALIGNMENT.CENTER
     table_cert.autofit = False
-    set_table_borders(table_cert, color="FFFFFF") # borderless signature table
 
     cell_0, cell_1 = table_cert.rows[0].cells
     cell_0.width = Inches(3.2)
@@ -312,23 +274,20 @@ def create_report():
     ]
 
     t_index = doc.add_table(rows=len(index_data)+1, cols=3)
+    t_index.style = 'Table Grid'
     t_index.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t_index)
     
     # Header
     for idx, h_text in enumerate(["Sr. No.", "Content", "Page No."]):
         cell = t_index.rows[0].cells[idx]
-        set_cell_margins(cell, top=120, bottom=120, left=150, right=150)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER if idx!=1 else WD_ALIGN_PARAGRAPH.LEFT)
+        format_cell(cell, h_text, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER if idx!=1 else WD_ALIGN_PARAGRAPH.LEFT)
 
     for r_idx, (sr, content, pg, is_b) in enumerate(index_data):
         row = t_index.rows[r_idx+1]
         for c_idx, val in enumerate([sr, content, pg]):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=80, bottom=80, left=120, right=120)
             align = WD_ALIGN_PARAGRAPH.CENTER if c_idx!=1 else WD_ALIGN_PARAGRAPH.LEFT
-            format_cell_text(cell, val, bold=is_b, align=align)
+            format_cell(cell, val, bold=is_b, align=align)
 
     doc.add_page_break()
 
@@ -387,19 +346,16 @@ def create_report():
         ("UI / UX", "User Interface / User Experience")
     ]
     t_acro = doc.add_table(rows=len(acronyms)+1, cols=2)
+    t_acro.style = 'Table Grid'
     t_acro.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t_acro)
     for idx, h_text in enumerate(["Acronym", "Expansion"]):
         cell = t_acro.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=150, right=150)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, (ac, exp) in enumerate(acronyms):
         row = t_acro.rows[r_idx+1]
         for c_idx, val in enumerate([ac, exp]):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=60, bottom=60, left=120, right=120)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
 
     doc.add_page_break()
 
@@ -551,19 +507,16 @@ def create_report():
         ("Missing Values", "1 empty record detected in raw CSV; handled via cleaning")
     ]
     t41 = doc.add_table(rows=len(t41_data)+1, cols=2)
+    t41.style = 'Table Grid'
     t41.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t41)
     for idx, h_text in enumerate(["Attribute", "Specification"]):
         cell = t41.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=150, right=150)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, (k, v) in enumerate(t41_data):
         row = t41.rows[r_idx+1]
         for c_idx, val in enumerate([k, v]):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=60, bottom=60, left=120, right=120)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 4.1: Summary Statistics of the Customer Churn Dataset", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_heading_2(doc, "4.3 Feature Space Definition (Model Inputs)")
@@ -582,19 +535,16 @@ def create_report():
         ("Churn", "Binary Target", "0 (Retained), 1 (Churned)", "Historical customer attrition outcome")
     ]
     t42 = doc.add_table(rows=len(t42_data)+1, cols=4)
+    t42.style = 'Table Grid'
     t42.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t42)
     for idx, h_text in enumerate(["Feature Name", "Data Type", "Value Range", "Description"]):
         cell = t42.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=100, right=100)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t42_data):
         row = t42.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=50, bottom=50, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 4.2: Feature Space Definition and Attribute Descriptions", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_heading_2(doc, "4.4 Data Preparation and Preprocessing Design")
@@ -610,19 +560,16 @@ def create_report():
         ("Decision Tree Classifier", "max_depth=6, min_samples_split=20, class_weight='balanced', random_state=42", "Models complex non-linear feature interactions and threshold cutoffs while remaining interpretable without overfitting.")
     ]
     t43 = doc.add_table(rows=len(t43_data)+1, cols=3)
+    t43.style = 'Table Grid'
     t43.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t43)
     for idx, h_text in enumerate(["Algorithm", "Hyperparameters", "Architectural Rationale"]):
         cell = t43.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t43_data):
         row = t43.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=60, bottom=60, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 4.3: Machine Learning Model Hyperparameters and Design Rationales", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_heading_2(doc, "4.6 Application Data Flow")
@@ -639,19 +586,16 @@ def create_report():
         ("sample_data.csv", "CSV Data Sample (5,000 records)", "Provides a lightweight, stratified sample for instant dashboard loading on Streamlit Community Cloud without memory overhead.")
     ]
     t44 = doc.add_table(rows=len(t44_data)+1, cols=3)
+    t44.style = 'Table Grid'
     t44.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t44)
     for idx, h_text in enumerate(["File Name", "File Type", "Operational Role"]):
         cell = t44.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t44_data):
         row = t44.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=60, bottom=60, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 4.4: Serialized Model Artifacts and Operational Roles", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     doc.add_page_break()
@@ -672,19 +616,16 @@ def create_report():
         ("Streamlit Cloud", "Global Hosting Platform", "Cloud server runtime for worldwide web access")
     ]
     t51 = doc.add_table(rows=len(t51_data)+1, cols=3)
+    t51.style = 'Table Grid'
     t51.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t51)
     for idx, h_text in enumerate(["Component", "Version / Spec", "Role in System Architecture"]):
         cell = t51.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t51_data):
         row = t51.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=50, bottom=50, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 5.1: Development Libraries, Platforms, and Runtime Versions", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_heading_2(doc, "5.2 Important Code Modules")
@@ -751,19 +692,16 @@ y_prob_dt = dt.predict_proba(X_test)[:, 1]"""
         ("ROC-AUC", "0.9605", "0.9866", "+0.0261", "Decision Tree")
     ]
     t52 = doc.add_table(rows=len(t52_data)+1, cols=5)
+    t52.style = 'Table Grid'
     t52.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t52)
     for idx, h_text in enumerate(["Metric", "Logistic Regression", "Decision Tree", "Variance", "Leading Model"]):
         cell = t52.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=100, right=100)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t52_data):
         row = t52.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=50, bottom=50, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==2 or c_idx==4))
+            format_cell(cell, val, bold=(c_idx==2 or c_idx==4))
     add_p(doc, "Table 5.2: Performance Evaluation Metrics on the 20% Hold-out Test Set (20,000 Samples)", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_image_safe(doc, os.path.join(fig_dir, "fig_5_4_model_comparison.png"), width_in=5.2, caption="Figure 5.4: Algorithmic Performance Comparison (Logistic Regression vs. Decision Tree)")
@@ -773,19 +711,16 @@ y_prob_dt = dt.predict_proba(X_test)[:, 1]"""
         ("Actual Churned (1)", "410 (False Negatives)", "10,931 (True Positives)")
     ]
     t53 = doc.add_table(rows=len(t53_data)+1, cols=3)
+    t53.style = 'Table Grid'
     t53.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(t53)
     for idx, h_text in enumerate(["Actual Ground Truth", "Predicted Retained (0)", "Predicted Churned (1)"]):
         cell = t53.rows[0].cells[idx]
-        set_cell_margins(cell, top=100, bottom=100, left=100, right=100)
-        set_cell_shading(cell, "F3F4F6")
-        format_cell_text(cell, h_text, bold=True)
+        format_cell(cell, h_text, bold=True)
     for r_idx, row_vals in enumerate(t53_data):
         row = t53.rows[r_idx+1]
         for c_idx, val in enumerate(row_vals):
             cell = row.cells[c_idx]
-            set_cell_margins(cell, top=50, bottom=50, left=100, right=100)
-            format_cell_text(cell, val, bold=(c_idx==0))
+            format_cell(cell, val, bold=(c_idx==0))
     add_p(doc, "Table 5.3: Confusion Matrix Contingency Values for Decision Tree Classifier", align=WD_ALIGN_PARAGRAPH.CENTER, space_before=4, space_after=12).runs[0].italic = True
 
     add_image_safe(doc, os.path.join(fig_dir, "fig_5_5_confusion_matrix.png"), width_in=4.4, caption="Figure 5.5: Confusion Matrix of the Decision Tree Classifier (20,000 Test Records)")

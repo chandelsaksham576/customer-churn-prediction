@@ -29,3 +29,10 @@ models/processed_data.pkl
 .mplconfig/
 extracted_media/
 
+# Academic reports and documents
+*.docx
+reports/
+PROJECT_REPORT.md
+build_complete_docx.py
+generate_figures.py
+

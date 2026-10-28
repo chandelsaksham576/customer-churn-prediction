@@ -26,4 +26,6 @@ desktop.ini
 *.zip
 churn_dataset.zip
 models/processed_data.pkl
+.mplconfig/
+extracted_media/
 

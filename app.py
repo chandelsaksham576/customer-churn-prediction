@@ -254,7 +254,7 @@ def main():
 
     st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
 
-    # Top KPI Row (4 Native Bordered Cards)
+    # Top KPI Row (6 Native Bordered Cards)
     total_customers = len(df)
     churned_customers = int((df[target_col] == 1).sum())
     retained_customers = total_customers - churned_customers
@@ -264,19 +264,25 @@ def main():
     spend_col = "Total Spend" if "Total Spend" in df.columns else None
     revenue_at_risk = df[df[target_col] == 1][spend_col].sum() if spend_col else 0
 
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+    kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
     with kpi1:
         with st.container(border=True):
             st.metric("Total Customers", f"{total_customers:,}", help="Active portfolio sample")
     with kpi2:
         with st.container(border=True):
-            st.metric("Monthly Revenue at Risk", f"${revenue_at_risk:,.0f}", help="Identified at-risk accounts")
+            st.metric("Retained Customers", f"{retained_customers:,}", help="Total subscribers who remained active")
     with kpi3:
         with st.container(border=True):
-            st.metric("Overall Retention Rate", f"{retention_rate:.1f}%", help=f"{retained_customers:,} active subscribers")
+            st.metric("Churned Customers", f"{churned_customers:,}", help="Total subscribers who cancelled")
     with kpi4:
         with st.container(border=True):
+            st.metric("Overall Retention Rate", f"{retention_rate:.1f}%", help=f"{retained_customers:,} active subscribers")
+    with kpi5:
+        with st.container(border=True):
             st.metric("Churn Rate", f"{churn_rate:.1f}%", help=f"{churned_customers:,} accounts churned")
+    with kpi6:
+        with st.container(border=True):
+            st.metric("Monthly Revenue at Risk", f"${revenue_at_risk:,.0f}", help="Cumulative spend of churned accounts")
 
     st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
@@ -288,94 +294,176 @@ def main():
     ])
 
     # =========================================================================
-    # TAB 1: OVERVIEW (Balanced 2x2 Grid)
+    # TAB 1: OVERVIEW (Data Visualization Dashboard)
     # =========================================================================
     with tab_overview:
-        row1_col1, row1_col2 = st.columns(2)
+        churned_df = df[df[target_col] == 1].copy()
 
-        with row1_col1:
+        # Row 1: 3 Pie/Donut Visualizations
+        r1_c1, r1_c2, r1_c3 = st.columns(3)
+
+        # 1. Total Customers: Stayed vs Churned
+        with r1_c1:
             with st.container(border=True):
-                segment_col = "Contract Length" if "Contract Length" in df.columns else engine.metadata["categorical_features"][0]
-                status_df = df.copy()
-                status_df["Status"] = status_df[target_col].map({1: "Churned", 0: "Retained"})
-
-                fig_status = px.histogram(
-                    status_df,
-                    x=segment_col,
-                    color="Status",
-                    barmode="group",
-                    color_discrete_map={"Retained": "#10B981", "Churned": "#F43F5E"}
+                fig_tot = go.Figure(data=[go.Pie(
+                    labels=["Stayed", "Churned"],
+                    values=[retained_customers, churned_customers],
+                    marker=dict(colors=["#6366F1", "#A855F7"]),
+                    textinfo="percent",
+                    textfont=dict(size=13, color="#FAFAFA"),
+                    direction="clockwise",
+                    sort=False
+                )])
+                format_matte_plot(fig_tot, title="Total Customers", height=290)
+                fig_tot.update_layout(
+                    legend=dict(
+                        orientation="v",
+                        yanchor="middle",
+                        y=0.5,
+                        xanchor="left",
+                        x=1.02,
+                        font=dict(color="#D4D4D8", size=11)
+                    ),
+                    margin=dict(l=15, r=80, t=45, b=20)
                 )
-                format_matte_plot(fig_status, title=f"Customer Status by {segment_col}")
-                fig_status.update_layout(xaxis_title="", yaxis_title="Subscribers")
-                st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
+                st.plotly_chart(fig_tot, use_container_width=True, config={"displayModeBar": False})
 
-        with row1_col2:
+        # 2. Churn by Contract Type
+        with r1_c2:
             with st.container(border=True):
-                tier_col = "Subscription Type" if "Subscription Type" in df.columns else (
-                    engine.metadata["categorical_features"][1] if len(engine.metadata["categorical_features"]) > 1 else segment_col
+                contract_counts = churned_df["Contract Length"].value_counts() if "Contract Length" in churned_df.columns else pd.Series()
+                contract_labels = contract_counts.index.tolist()
+                contract_vals = contract_counts.values.tolist()
+
+                # Elegant palette matching reference: Blue, Amber/Orange, Mint/Green
+                fig_contract = go.Figure(data=[go.Pie(
+                    labels=contract_labels,
+                    values=contract_vals,
+                    marker=dict(colors=["#60A5FA", "#FB923C", "#34D399", "#818CF8"]),
+                    textinfo="percent",
+                    textfont=dict(size=13, color="#FAFAFA"),
+                    direction="clockwise",
+                    sort=False
+                )])
+                format_matte_plot(fig_contract, title="Churn by Contract Type", height=290)
+                fig_contract.update_layout(
+                    legend=dict(
+                        orientation="v",
+                        yanchor="middle",
+                        y=0.5,
+                        xanchor="left",
+                        x=1.02,
+                        font=dict(color="#D4D4D8", size=11)
+                    ),
+                    margin=dict(l=15, r=90, t=45, b=20)
                 )
-                tier_churn = df.groupby(tier_col)[target_col].agg(["count", "mean"]).reset_index()
-                tier_churn["Churn_Rate_%"] = (tier_churn["mean"] * 100).round(1)
+                st.plotly_chart(fig_contract, use_container_width=True, config={"displayModeBar": False})
 
-                fig_tier = px.bar(
-                    tier_churn,
-                    x=tier_col,
-                    y="Churn_Rate_%",
-                    color_discrete_sequence=["#F43F5E"],
-                    text="Churn_Rate_%"
-                )
-                format_matte_plot(fig_tier, title=f"Churn Rate across {tier_col}")
-                fig_tier.update_traces(textposition="outside", textfont=dict(color="#A1A1AA", size=10))
-                fig_tier.update_layout(xaxis_title="", yaxis_title="Churn Rate (%)", yaxis=dict(range=[0, max(tier_churn["Churn_Rate_%"]) * 1.25]))
-                st.plotly_chart(fig_tier, use_container_width=True, config={"displayModeBar": False})
-
-        row2_col1, row2_col2 = st.columns(2)
-
-        with row2_col1:
+        # 3. Churn by Gender
+        with r1_c3:
             with st.container(border=True):
-                scatter_x = "Tenure" if "Tenure" in df.columns else engine.metadata["numerical_features"][0]
-                scatter_y = "Total Spend" if "Total Spend" in df.columns else (
-                    engine.metadata["numerical_features"][1] if len(engine.metadata["numerical_features"]) > 1 else scatter_x
-                )
-                scatter_sample = df.sample(min(len(df), 1200), random_state=42).copy()
-                scatter_sample["Status"] = scatter_sample[target_col].map({1: "Churned", 0: "Retained"})
+                gender_counts = churned_df["Gender"].value_counts() if "Gender" in churned_df.columns else pd.Series()
+                gender_labels = gender_counts.index.tolist()
+                gender_vals = gender_counts.values.tolist()
 
-                fig_scatter = px.scatter(
-                    scatter_sample,
-                    x=scatter_x,
-                    y=scatter_y,
-                    color="Status",
-                    color_discrete_map={"Retained": "#10B981", "Churned": "#F43F5E"},
-                    opacity=0.65
+                fig_gender = go.Figure(data=[go.Pie(
+                    labels=gender_labels,
+                    values=gender_vals,
+                    marker=dict(colors=["#8B5CF6", "#C4B5FD"]),
+                    textinfo="percent",
+                    textfont=dict(size=13, color="#FAFAFA"),
+                    direction="clockwise",
+                    sort=False
+                )])
+                format_matte_plot(fig_gender, title="Churn by Gender", height=290)
+                fig_gender.update_layout(
+                    legend=dict(
+                        orientation="v",
+                        yanchor="middle",
+                        y=0.5,
+                        xanchor="left",
+                        x=1.02,
+                        font=dict(color="#D4D4D8", size=11)
+                    ),
+                    margin=dict(l=15, r=80, t=45, b=20)
                 )
-                format_matte_plot(fig_scatter, title=f"Customer Value vs. {scatter_x}")
-                fig_scatter.update_traces(marker=dict(size=5))
-                fig_scatter.update_layout(xaxis_title=f"{scatter_x} (Months)", yaxis_title=f"{scatter_y} ($)")
-                st.plotly_chart(fig_scatter, use_container_width=True, config={"displayModeBar": False})
+                st.plotly_chart(fig_gender, use_container_width=True, config={"displayModeBar": False})
 
-        with row2_col2:
+        # Row 2: Spend / Monthly Charges Breakdown & Tenure Bar Chart
+        r2_c1, r2_c2 = st.columns([1, 1.4])
+
+        # 4. Churn by Spend Tier / Monthly Charges
+        with r2_c1:
             with st.container(border=True):
-                if "Support Calls" in df.columns:
-                    support_churn = df.groupby("Support Calls")[target_col].agg(["count", "mean"]).reset_index()
-                    support_churn["Churn_Rate_%"] = (support_churn["mean"] * 100).round(1)
-
-                    fig_support = px.line(
-                        support_churn,
-                        x="Support Calls",
-                        y="Churn_Rate_%",
-                        markers=True,
-                        line_shape="linear"
+                spend_col = "Total Spend" if "Total Spend" in churned_df.columns else None
+                if spend_col:
+                    spend_bins = pd.cut(
+                        churned_df[spend_col],
+                        bins=[0, 400, 700, 10000],
+                        labels=["Low (< $400)", "Medium ($400–$700)", "High (> $700)"]
                     )
-                    format_matte_plot(fig_support, title="Churn Rate Surge by Support Inquiries")
-                    fig_support.update_traces(line=dict(color="#F43F5E", width=2), marker=dict(size=6, color="#FAFAFA"))
-                    fig_support.update_layout(xaxis_title="Support Calls Logged", yaxis_title="Churn Rate (%)")
-                    st.plotly_chart(fig_support, use_container_width=True, config={"displayModeBar": False})
-                else:
-                    alt_col = engine.metadata["numerical_features"][0]
-                    fig_alt = px.histogram(df, x=alt_col, color=target_col, color_discrete_map={0: "#10B981", 1: "#F43F5E"})
-                    format_matte_plot(fig_alt, title=f"Distribution of {alt_col}")
-                    st.plotly_chart(fig_alt, use_container_width=True, config={"displayModeBar": False})
+                    spend_counts = spend_bins.value_counts(sort=False).reindex(["Low (< $400)", "Medium ($400–$700)", "High (> $700)"])
+                    fig_spend = go.Figure(data=[go.Pie(
+                        labels=spend_counts.index.tolist(),
+                        values=spend_counts.values.tolist(),
+                        marker=dict(colors=["#60A5FA", "#FB923C", "#34D399"]),
+                        textinfo="percent",
+                        textfont=dict(size=13, color="#FAFAFA"),
+                        direction="clockwise",
+                        sort=False
+                    )])
+                    format_matte_plot(fig_spend, title="Churn by Customer Spend Tier", height=290)
+                    fig_spend.update_layout(
+                        legend=dict(
+                            orientation="v",
+                            yanchor="middle",
+                            y=0.5,
+                            xanchor="left",
+                            x=1.02,
+                            font=dict(color="#D4D4D8", size=11)
+                        ),
+                        margin=dict(l=15, r=120, t=45, b=20)
+                    )
+                    st.plotly_chart(fig_spend, use_container_width=True, config={"displayModeBar": False})
+
+        # 5. Churn by Tenure (Categorical Percentage Bar Chart)
+        with r2_c2:
+            with st.container(border=True):
+                tenure_col = "Tenure" if "Tenure" in churned_df.columns else None
+                if tenure_col:
+                    tenure_bins = pd.cut(
+                        churned_df[tenure_col],
+                        bins=[-1, 12, 24, 36, 120],
+                        labels=["0–1 year", "1–2 years", "2–3 years", "3+ years"]
+                    )
+                    tenure_counts = tenure_bins.value_counts(sort=False).reindex(["0–1 year", "1–2 years", "2–3 years", "3+ years"])
+                    tenure_pct = (tenure_counts / tenure_counts.sum() * 100).round(1)
+
+                    fig_tenure = go.Figure(data=[go.Bar(
+                        x=tenure_pct.index.tolist(),
+                        y=tenure_pct.values.tolist(),
+                        text=[f"{v:.1f}%" for v in tenure_pct.values],
+                        textposition="outside",
+                        textfont=dict(color="#FAFAFA", size=12, family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"),
+                        marker=dict(
+                            color="#8B5CF6",
+                            line=dict(color="#A78BFA", width=1)
+                        ),
+                        width=0.45
+                    )])
+                    format_matte_plot(fig_tenure, title="Churn by Tenure", height=290)
+                    fig_tenure.update_layout(
+                        xaxis_title="",
+                        yaxis_title="",
+                        yaxis=dict(
+                            ticksuffix="%",
+                            range=[0, max(tenure_pct.values) * 1.25],
+                            showgrid=True,
+                            gridcolor="#27272A"
+                        ),
+                        margin=dict(l=25, r=20, t=45, b=25)
+                    )
+                    st.plotly_chart(fig_tenure, use_container_width=True, config={"displayModeBar": False})
 
     # =========================================================================
     # TAB 2: MODEL EVALUATION
